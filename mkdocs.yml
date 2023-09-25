@@ -1,0 +1,121 @@
+# Project information
+site_name: "Taller de Next con Typescript"
+site_url: "https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs"
+site_author: "Aula de Software Libre <aulasoftwarelibre@uco.es>"
+site_description: >-
+  Taller del curso de React con Typescript. Este taller es parte del curso de 
+  Arquitectura de Software del Aula de Software Libre
+
+# Repository information
+repo_name: "aulasoftwarelibre/taller-de-next-con-typescript-docs"
+repo_url: "https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs"
+
+# License
+copyright: Copyleft - CC BY-NC 4.0 - Aula de Software Libre
+
+# Configuration
+theme:
+  favicon: "images/logoasl.png"
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - navigation.instant
+    - navigation.footer
+    - navigation.tracking
+  icon:
+    logo: material/git
+  name: "material"
+  language: "es"
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: "https://github.com/aulasoftwarelibre"
+    - icon: fontawesome/brands/twitter
+      link: "https://twitter.com/aulasl"
+    - icon: fontawesome/brands/facebook
+      link: "https://facebook.com/aulasl"
+    - icon: fontawesome/brands/instagram
+      link: "https://instagram.com/aulasoftwarelibre"
+    - icon: fontawesome/brands/youtube
+      link: "https://www.youtube.com/c/AulaSoftwareLibre"
+    - icon: fontawesome/brands/linkedin
+      link: "https://www.linkedin.com/company/aulasoftwarelibre/"
+  analytics:
+    provider: google
+    property: UA-51754922-1
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - git-revision-date-localized:
+      type: date
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/mkdocs.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+  - tables
+  - toc:
+      permalink: true
+
+# Page tree
+nav:
+  - Inicio: index.md
+  - Introducción: new-project.md
+  - Dependencias: dependencies.md
+  - Creando el boilerplate: install.md
+  - Configurando NextUI: nextui.md
+  - Storybook: storybook.md
