@@ -6,8 +6,8 @@ on:
 
 # Environment
 env:
-  PYTHON_VERSION: 3.9
-  POETRY_VERSION: 1.1.13
+  PYTHON_VERSION: 3.10.13
+  POETRY_VERSION: 1.6.1
 
 jobs:
   # Build and deploy documentation site
