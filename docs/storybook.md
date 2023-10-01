@@ -6,17 +6,27 @@ Sin embargo, no suele ser sencillo de configurar. Aunque la herramienta de insta
 
 ## Instalación
 
-En vez de dirigirnos a la web principal, vamos a indicar los pasos a seguir. Lo primero es instalar storybook dentro de nuestro proyecto.
+En vez de dirigirnos a la web principal, vamos a indicar los pasos a seguir. Lo primero es instalar storybook dentro de nuestro proyecto. Nos preguntará si
+queremos usar el plugin de eslint, le diremos que sí.
 
 ```bash
-npx storybook@latest init
+npx storybook@latest init -t nextjs
 ```
+
+!!! note
+    Normalmente el instalador detecta el tipo de proyecto, pero hemos tenido
+    algún problema haciendo este tutorial, por eso estamos forzando a detectar
+    nextjs con el parámetro `-t nextjs`.
+
 
 Seleccionaremos todas las respuestas por defecto. Con esto ya tendremos una serie de componentes básicos para que podamos ver su funcionamiento:
 
 ```bash
 npm run storybook
 ```
+
+!!! info
+    La primera vez que se instala se inicia solo y nos muestra un tutorial.
 
 Se nos abrirá esta página con algunos componentes de ejemplo:
 
@@ -26,34 +36,17 @@ Se nos abrirá esta página con algunos componentes de ejemplo:
 !!! warning
     Storybook crea una serie de historias de ejemplo en el directorio `src/stories`. Recuerda no guardarlas en git.
 
-## Creación de una historia
+## Configuración de Storybook
 
-Una historia en Storybook es una representación visual y funcional de un componente de React en un estado particular o variación. Cada historia describe cómo se ve y se comporta un componente en un contexto específico, lo que facilita la visualización y documentación de su uso y apariencia.
+Storybook es una aplicación distinta a la de next, por tanto, no tiene por qué
+cargar la misma configuración que tenemos en nuestro proyecto. Esta es la parte
+más complicada de hacer funcionar Storybook.
 
-Vamos a crear la historia del componente que creamos antes:
+En nuestro caso tenemos tres partes que tenemos que configurar: el entorno de
+typescript, los estilos de NextUI y los providers para los estados de los
+componentes.
 
-```typescript title="src/stories/components/ThemeSwitcher.stories.ts"
-import ThemeSwitcher from "@/components/ThemeSwitcher";
-import { Meta, StoryObj } from "@storybook/react";
-
-const meta = {
-    title: 'Components/ThemeSwitcher',
-    component: ThemeSwitcher,
-} satisfies Meta<typeof ThemeSwitcher>
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const Basic: Story = {}
-```
-
-!!! info
-    Es probable que storybook se vuelva inestable cuando se añade un nuevo fichero.
-    Si fuera así hay que reiniciarlo.
-
-Y aparecerá una nueva sección llamada componentes que tendrá nuestra historia. Desgraciadamente no se verá como se espera. Eso es debido a que tenemos que configurar nuestro entorno para que sea el mismo qeu tiene next. Para ello debemos modificar los archivos que están en el directorio `.storybook`.
-
-Este fichero permite usar los alias de typescript:
+Vamos a empezar por el entorno de typescript. Necesitamos que Storybook entienad los paths que tenemos configurados en el archivo `tsconfig.json`:
 
 ```typescript title=".storybook/main.ts" hl_lines="2 19-27" 
 import type { StorybookConfig } from "@storybook/nextjs";
@@ -87,7 +80,11 @@ const config: StorybookConfig = {
 export default config;
 ```
 
-Este fichero nos permite cargar los estilos:
+A continuación vamos a cargar los providers a la hora de visualizar los 
+componentes:
+
+!!! warning
+    El fichero `.storybook/preview.ts` debe ser renombrado a `.storybook/preview.tsx`. Después es probable que tengas que reiniciar el storybook.
 
 ```typescript title=".storybook/preview.tsx" linenums="1" hl_lines="2-5 9-15"
 import type { Preview } from "@storybook/react";
@@ -119,10 +116,37 @@ const preview: Preview = {
 export default preview;
 ```
 
-!!! warning
-    El fichero `.storybook/preview.ts` debe ser renombrado a `.storybook/preview.tsx`.
 
-Ahora si reiniciamos _Storybook_ veremos nuestra historia de forma correcta. Podemos ya incluso borrar los componentes de ejemplo.
+## Creación de una historia
+
+Una historia en Storybook es una representación visual y funcional de un componente de React en un estado particular o variación. Cada historia describe cómo se ve y se comporta un componente en un contexto específico, lo que facilita la visualización y documentación de su uso y apariencia.
+
+Vamos a crear la historia del componente que creamos antes:
+
+```typescript title="src/stories/components/ThemeSwitcher.stories.ts"
+import ThemeSwitcher from "@/components/ThemeSwitcher";
+import { Meta, StoryObj } from "@storybook/react";
+
+const meta = {
+    title: 'Components/ThemeSwitcher',
+    component: ThemeSwitcher,
+} satisfies Meta<typeof ThemeSwitcher>
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Basic: Story = {}
+```
+
+!!! warning
+    Es probable que storybook se vuelva inestable cuando se añade un nuevo fichero. Si fuera así hay que reiniciarlo.
+
+Y aparecerá una nueva sección llamada componentes que tendrá nuestra historia. 
+
+Ahora veremos nuestra historia de forma correcta. Podemos ya incluso borrar los componentes de ejemplo.
 
 ![Storybook configurado](images/storybook-configured.png)
 
+!!! question "Ejercicio"
+    Guarda los cambios que hemos hecho y la historia que hemos creado en git.
+    No guardes los componentes de ejemplo.

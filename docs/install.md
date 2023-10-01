@@ -282,7 +282,7 @@ Y con el siguiente comando podremos añadir un comando test a npm:
 npm pkg set scripts.test="jest"
 ```
 
-!!! question
+!!! question "Ejercicio"
     Se deja como ejercicio, guardar los cambios en git con la configuración de
     jest y siguiendo conventional commits para el mensaje.
 
