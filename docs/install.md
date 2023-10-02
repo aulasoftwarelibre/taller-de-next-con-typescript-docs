@@ -199,7 +199,7 @@ Y ahora configuramos husky para que ejecute lint-staged antes de cada commit:
 
 ```
 npm pkg set scripts.prepare="husky install"
-nnpm run prepare
+npm run prepare
 npx husky add .husky/pre-commit "npx lint-staged"
 ```
 
