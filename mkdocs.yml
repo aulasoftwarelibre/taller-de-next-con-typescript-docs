@@ -9,6 +9,7 @@ site_description: >-
 # Repository information
 repo_name: "aulasoftwarelibre/taller-de-next-con-typescript-docs"
 repo_url: "https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs"
+edit_uri: edit/main/docs/
 
 # License
 copyright: Copyleft - CC BY-NC 4.0 - Aula de Software Libre
