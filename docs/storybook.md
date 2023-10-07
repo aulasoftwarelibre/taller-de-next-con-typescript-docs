@@ -48,7 +48,7 @@ componentes.
 
 Vamos a empezar por el entorno de typescript. Necesitamos que Storybook entienad los paths que tenemos configurados en el archivo `tsconfig.json`:
 
-```typescript title=".storybook/main.ts" hl_lines="2 19-27" 
+```typescript title=".storybook/main.ts" hl_lines="2 19-28" 
 import type { StorybookConfig } from "@storybook/nextjs";
 import path from "path";
 
@@ -67,6 +67,7 @@ const config: StorybookConfig = {
   docs: {
     autodocs: "tag",
   },
+  staticDirs: ["../public"], // (1)!
   webpackFinal: async (config) => {
     if (config.resolve) {
       config.resolve.alias = {
@@ -79,6 +80,8 @@ const config: StorybookConfig = {
 };
 export default config;
 ```
+
+1. La opción `staticDirs` permite indicar el directorio público donde se envían los ficheros estáticos al navegador.
 
 A continuación vamos a cargar los providers a la hora de visualizar los 
 componentes:
