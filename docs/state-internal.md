@@ -83,6 +83,8 @@ export default function Menu() {
 ### Componente CounterLayout
 
 ```ts title="src/app/counter/layout.tsx"
+'use client'
+
 import Menu from '@/components/Menu'
 
 export default function CounterLayout({

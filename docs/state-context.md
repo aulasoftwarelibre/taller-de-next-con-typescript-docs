@@ -10,7 +10,7 @@ Un contexto en React consta generalmente de tres partes clave:
 
 ## Contexto básico
 
-Este archivo define los tipos de datos relacionados con el contexto del contador. Define una interfaz CounterState que incluye un campo counter que representa el valor del contador y una función setCounter que se utiliza para actualizar ese valor:
+Este archivo define los tipos de datos relacionados con el contexto del contador. Define una interfaz `CounterState` que incluye un campo `counter` que representa el valor del contador y una función `setCounter` que se utiliza para actualizar ese valor:
 
 ```ts title="src/state/CounterProvider/types.ts"
 export type CounterState = {
@@ -27,7 +27,7 @@ export type CounterState = {
 
     Por el momento lo haremos así y en la sección siguiente los separaremos.
 
-En este archivo, se utiliza la función createContext de React para crear el contexto. Se crea un contexto llamado CounterStateContext que inicialmente se establece como undefined. Este contexto actuará como un contenedor para los datos y las funciones relacionadas con el contador:
+En este archivo, se utiliza la función `createContext` de React para crear el contexto. Se crea un contexto llamado `CounterStateContext` que inicialmente se establece como `undefined`. Este contexto actuará como un contenedor para los datos y las funciones relacionadas con el contador:
 
 ```ts title="src/state/CounterProvider/context.ts"
 import { createContext } from 'react'
@@ -39,7 +39,7 @@ export const CounterStateContext = createContext<CounterState | undefined>(
 )
 ```
 
-El componente CounterProvider es el proveedor de contexto. Utiliza el hook useState para crear y mantener el estado del contador, con un valor inicial de 0. Luego, utiliza el contexto CounterStateContext.Provider para proporcionar el valor del contador y la función setCounter a cualquier componente descendiente que consuma este contexto.
+El componente `CounterProvider` es el proveedor de contexto. Utiliza el hook `useState` para crear y mantener el estado del contador, con un valor inicial de 0. Luego, utiliza el contexto `CounterStateContext.Provider` para proporcionar el valor del contador y la función `setCounter` a cualquier componente descendiente que consuma este contexto.
 
 ```ts title="src/state/CounterProvider/CounterProvider.tsx"
 import { useState } from 'react'
@@ -61,7 +61,7 @@ export default function CounterProvider({
 }
 ```
 
-Este archivo contiene un hook personalizado llamado useCounter. Este hook se utiliza para consumir el contexto CounterStateContext y proporciona una interfaz para acceder al valor del contador y las funciones de incremento y reinicio. Si se utiliza fuera del contexto del proveedor, arrojará un error para asegurarse de que se utilice correctamente.
+Este archivo contiene un hook personalizado llamado useCounter. Este hook se utiliza para consumir el contexto `CounterStateContext` y proporciona una interfaz para acceder al valor del contador y las funciones de incremento y reinicio. Si se utiliza fuera del contexto del proveedor, arrojará un error para asegurarse de que se utilice correctamente.
 
 ```ts title="src/state/CounterProvider/hooks.ts"
 import { useCallback, useContext } from 'react'
@@ -92,7 +92,7 @@ export const useCounter = () => {
 }
 ```
 
-Este archivo exporta el CounterProvider y el hook useCounter, lo que facilita su importación en otros archivos de la aplicación sin tener que preocuparse por las rutas de los archivos.
+Este archivo exporta el `CounterProvider` y el hook `useCounter`, lo que facilita su importación en otros archivos de la aplicación sin tener que preocuparse por las rutas de los archivos.
 
 ```ts title="src/state/CounterProvider/index.ts"
 export { default } from './CounterProvider'
