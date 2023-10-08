@@ -120,3 +120,10 @@ nav:
   - Creando el boilerplate: install.md
   - Configurando NextUI: nextui.md
   - Storybook: storybook.md
+  - Gestión del estado: 
+      - Componente contador: state.md
+      - Componentes con estado: state-internal.md
+      - Componentes sin estado: state-external.md
+      - Context API: state-context.md
+      - Uso de reducers: state-reducer.md
+      
