@@ -115,11 +115,12 @@ markdown_extensions:
 # Page tree
 nav:
   - Inicio: index.md
-  - Introducción: new-project.md
-  - Dependencias: dependencies.md
-  - Creando el boilerplate: install.md
-  - Configurando NextUI: nextui.md
-  - Storybook: storybook.md
+  - Crear el proyecto base:
+    - Introducción: new-project.md
+    - Dependencias: dependencies.md
+    - Creando el boilerplate: install.md
+    - Configurando NextUI: nextui.md
+    - Storybook: storybook.md
   - Gestión del estado: 
       - Componente contador: state.md
       - Componentes con estado: state-internal.md
