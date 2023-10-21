@@ -119,12 +119,69 @@ import { Session } from 'next-auth'
 
 import { auth } from '@/lib/next/auth'
 
-export default async function DashboardPage() {
+export default async function Page() {
   const session: Session | null = await auth()
 
-  // Si la variable `session` no es null, podemos conseguir los siguientes datos.
-  if (session) {
-    const { user: { email, image, name } = {} } = session
+  // Podemos ver en la consola de NextJS todos los datos del servidor
+  console.table(session)
+
+  if (!session) {
+    return <>Unauthorized</>
+  }
+
+  const { user: { name } = {} } = session
+
+  return <>Hello, {name}.</>
+}
+```
+
+## Ampliar datos de la sesión
+
+En ocasiones necesitamos saber más datos provenientes del proveedor de identidad. Uno
+de ellos es el `id`, que no viene. Vamos a añadirlo.
+
+Modificamos nuestra configuración:
+
+```ts title="src/app/api/auth/[...nextauth]/route.ts" hl_lines="5-11"
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import GithubProvider from 'next-auth/providers/github'
+
+export const config: NextAuthOptions = {
+  callbacks: {
+    async session({ session, token }) {
+      session.user.id = token.sub
+
+      return session
+    },
+  },
+  providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID || '',
+      clientSecret: process.env.GITHUB_SECRET || '',
+    }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+}
+
+const handler = NextAuth(config)
+
+export { handler as GET, handler as POST }
+```
+
+Estamos añadiendo un campo extra, desgraciadamente ese campo no existe en el interfaz
+de usuario original, pero podemos ampliarlo. Esta técnica se llama interface augmention.
+Creamos el siguiente fichero:
+
+```ts title="src/types/next-auth.d.ts"
+import { DefaultSession } from 'next-auth'
+
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id?: string | null
+    } & DefaultSession['user']
   }
 }
 ```
+
+Y ya el interprete de Typescript debe dejar de dar error porque el campo id no existe.
