@@ -40,7 +40,7 @@ imports.
 Procedemos a instalar las dependencias de desarrollo:
 
 ```bash
-npm install --save-dev eslint-config-prettier eslint-plugin-import \
+npm install --save-dev prettier eslint-config-prettier eslint-plugin-import \
 eslint-plugin-prettier eslint-plugin-simple-import-sort eslint-plugin-sort \
 eslint-plugin-unused-imports @typescript-eslint/eslint-plugin \
 @typescript-eslint/parser
