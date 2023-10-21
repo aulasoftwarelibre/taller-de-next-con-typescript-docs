@@ -36,6 +36,12 @@ Se nos abrirá esta página con algunos componentes de ejemplo:
 !!! warning
     Storybook crea una serie de historias de ejemplo en el directorio `src/stories`. Recuerda no guardarlas en git.
 
+Para tener soporte de tema oscuro, necesitamos también instalar el siguiente paquete:
+
+```bash
+npm install --save-dev @storybook/addon-themes
+```
+
 ## Configuración de Storybook
 
 Storybook es una aplicación distinta a la de next, por tanto, no tiene por qué
@@ -46,19 +52,21 @@ En nuestro caso tenemos tres partes que tenemos que configurar: el entorno de
 typescript, los estilos de NextUI y los providers para los estados de los
 componentes.
 
-Vamos a empezar por el entorno de typescript. Necesitamos que Storybook entienad los paths que tenemos configurados en el archivo `tsconfig.json`:
+Vamos a empezar por el entorno de typescript. Necesitamos que Storybook entienad los paths que tenemos configurados en el archivo `tsconfig.json`.
+También vamos a aprovechar para mover la carpeta de historias `stories` a la raíz del repositorio:
 
-```typescript title=".storybook/main.ts" hl_lines="2 19-28" 
+```typescript title=".storybook/main.ts" hl_lines="2 5 11 20-29" 
 import type { StorybookConfig } from "@storybook/nextjs";
 import path from "path";
 
 const config: StorybookConfig = {
-  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
+  stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-onboarding",
     "@storybook/addon-interactions",
+    "@storybook/addon-themes",
   ],
   framework: {
     name: "@storybook/nextjs",
@@ -86,37 +94,34 @@ export default config;
 A continuación vamos a cargar los providers a la hora de visualizar los 
 componentes:
 
-!!! warning
-    El fichero `.storybook/preview.ts` debe ser renombrado a `.storybook/preview.tsx`. Después es probable que tengas que reiniciar el storybook.
+```typescript title=".storybook/preview.ts" linenums="1" hl_lines="1 6-15"
+import "@/app/globals.css";
 
-```typescript title=".storybook/preview.tsx" linenums="1" hl_lines="2-5 9-15"
-import type { Preview } from "@storybook/react";
-import * as React from "react";
-
-import "../src/app/globals.css";
-import { Providers } from "../src/app/providers";
-
+import type {Preview} from '@storybook/react'
+import {withThemeByClassName} from '@storybook/addon-themes';
 
 const preview: Preview = {
-  decorators: [
-    (Story) => 
-      <Providers>
-        <Story />
-      </Providers>
-    ,
-  ],
-  parameters: {
-    actions: { argTypesRegex: "^on[A-Z].*" },
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/,
-      },
+    decorators: [
+        withThemeByClassName({
+            themes: {
+                light: 'light',
+                dark: 'dark',
+            },
+            defaultTheme: 'light',
+        }),
+    ],
+    parameters: {
+        actions: {argTypesRegex: '^on[A-Z].*'},
+        controls: {
+            matchers: {
+                color: /(background|color)$/i,
+                date: /Date$/i,
+            },
+        },
     },
-  },
-};
+}
 
-export default preview;
+export default preview
 ```
 
 
@@ -126,7 +131,7 @@ Una historia en Storybook es una representación visual y funcional de un compon
 
 Vamos a crear la historia del componente que creamos antes:
 
-```typescript title="src/stories/components/ThemeSwitcher.stories.ts"
+```typescript title="stories/components/ThemeSwitcher.stories.ts"
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { Meta, StoryObj } from "@storybook/react";
 
@@ -142,7 +147,8 @@ export const Basic: Story = {}
 ```
 
 !!! warning
-    Es probable que storybook se vuelva inestable cuando se añade un nuevo fichero. Si fuera así hay que reiniciarlo.
+    Se ha cambiado la configuración para cargar las historias desde `/stories` en vez de `/src/stories`. Las historias que se han creado por
+    defecto las puedes eliminar o moverlas a la nueva carpeta.
 
 Y aparecerá una nueva sección llamada componentes que tendrá nuestra historia. 
 
