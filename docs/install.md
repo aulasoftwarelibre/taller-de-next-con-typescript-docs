@@ -40,22 +40,18 @@ imports.
 Procedemos a instalar las dependencias de desarrollo:
 
 ```bash
-npm install --save-dev prettier eslint-config-prettier eslint-plugin-import \
-eslint-plugin-prettier eslint-plugin-simple-import-sort eslint-plugin-sort \
-eslint-plugin-unused-imports @typescript-eslint/eslint-plugin \
-@typescript-eslint/parser
+npm install --save-dev  "@typescript-eslint/eslint-plugin@^6" "@typescript-eslint/parser@^6" \
+eslint-plugin-import eslint-plugin-simple-import-sort eslint-plugin-sort eslint-plugin-unused-imports \
+prettier eslint-config-prettier eslint-plugin-prettier eslint-plugin-unicorn 
 ```
 
 Y a continuación vamos a editar el archivo `.eslintrc.json` con este contenido:
 
 ```json title=".eslintrc.json"
 {
-  "env": {
-    "node": true,
-    "jest": true
-  },
   "extends": [
     "next",
+    "plugin:unicorn/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
@@ -88,6 +84,7 @@ Y a continuación vamos a editar el archivo `.eslintrc.json` con este contenido:
     "sort/destructuring-properties": "error",
     "sort/object-properties": "error",
     "sort/type-properties": "error",
+    "unicorn/no-null": "off",
     "unused-imports/no-unused-imports": "error"
   }
 }
@@ -129,18 +126,36 @@ npm run lint -- --fix
 
     ```json title=".vscode/settings.json"
     {
-    "editor.codeActionsOnSave": {
-        "source.fixAll": true,
-        "source.organizeImports": true
-    },
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+      "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+        "source.organizeImports": "always"
+      },
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "editor.formatOnSave": true
     }
     ```
 
     Esta configuración de vscode es exclusiva para este proyecto, se puede
     configurar para que lo haga en todos los que creemos si configuramos
     estas opciones en el entorno de usuario. 
+
+    Probablemente veamos un error indicando que el plugin `esbenp.prettier-vscode` 
+    no existe, debido a que probablemente no lo tengamos instalado. Los IDE
+    suelen proporcionar plugins que facilitan el trabajo. Si quieres, puedes instalar
+    esa extensión manualmente o crear este fichero que te recomendará instalar
+    varias extensiones que usaremos en este taller. 
+  
+
+    ```json title=".vscode/extensions.json"
+    {
+      "recommendations": [
+        "esbenp.prettier-vscode",
+        "vitest.explorer",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+    ```
+
     Se recomienda ver el [Taller de VSCode](https://aulasoftwarelibre.github.io/taller-vscode/).
 
 ## Git hooks
@@ -173,15 +188,15 @@ npm install --save-dev husky lint-staged
 
 Y creamos el archivo de configuración:
 
-```javascript title=".lintstagedrc.js"
-const path = require('path')
- 
+```javascript title=".lintstagedrc.mjs"
+import { relative } from 'path'
+
 const buildEslintCommand = (filenames) =>
   `next lint --fix --file ${filenames
-    .map((f) => path.relative(process.cwd(), f))
+    .map((f) => relative(process.cwd(), f))
     .join(' --file ')}`
- 
-module.exports = {
+
+export default {
   '*.{js,jsx,ts,tsx}': [buildEslintCommand],
 }
 ```
@@ -198,9 +213,8 @@ module.exports = {
 Y ahora configuramos husky para que ejecute lint-staged antes de cada commit:
 
 ```
-npm pkg set scripts.prepare="husky install"
-npm run prepare
-npx husky add .husky/pre-commit "npx lint-staged"
+npx husky init
+echo "npx lint-staged" > .husky/pre-commit
 ```
 
 ### Configurar _conventional commits_
@@ -222,8 +236,8 @@ dependencias:
 
 ```bash
 npm install --save-dev @commitlint/{config-conventional,cli}
-echo "module.exports = {extends: ['@commitlint/config-conventional']};" > .commitlintrc.js
-npx husky add .husky/commit-msg  'npx --no -- commitlint --edit ${1}'
+echo "export default { extends: ['@commitlint/config-conventional'] }" > .commitlintrc.mjs
+echo "npx --no -- commitlint --edit ${1}" > .husky/commit-msg
 ```
 
 Y una vez hecho todo eso intentamos ya, por fin, guardar los cambios y veremos
@@ -242,49 +256,50 @@ git commit -m "chore: configure linting, lint-staged and conventional commits"
     git commit --allow-empty -m "invalid message"
     ```
 
-## Jest
+## Vitest
 
-Para completar nuestro entorno, vamos a configurar jest. Jest es un marco de pruebas (testing framework) ampliamente utilizado en el desarrollo de aplicaciones JavaScript y React. Sirve para automatizar y simplificar la realización de pruebas unitarias, de integración y funcionales en el código de tu aplicación. Jest facilita la creación de pruebas al proporcionar un conjunto de utilidades y funciones que permiten escribir y ejecutar pruebas de manera eficiente, asegurando que tu código funcione como se espera y reduciendo la probabilidad de errores en producción.
+Para completar nuestro entorno, vamos a configurar Vitest. Vitest es un marco de pruebas (testing framework) moderno y rápido, diseñado específicamente para el ecosistema de Vite, pero que también se adapta perfectamente al desarrollo de aplicaciones React. Ofrece una experiencia de prueba eficiente y optimizada, facilitando la realización de pruebas unitarias, de integración y funcionales. Gracias a su compatibilidad con la API de Jest, Vitest permite una transición suave para aquellos proyectos que desean mejorar su velocidad y eficiencia en las pruebas.
 
 Instalamos las dependencias:
 
 ```bash
-npm install --save-dev jest jest-environment-jsdom @testing-library/react \
-@testing-library/jest-dom
+npm install --save-dev vitest @testing-library/react @vitejs/plugin-react jsdom
 ```
 
 Y creamos el archivo de configuración:
 
-```js title="jest.config.mjs"
-import nextJest from 'next/jest.js'
- 
-const createJestConfig = nextJest({
-  // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
-  dir: './',
+```js title="vitest.config.mjs"
+import { defineConfig } from 'vitest/config'
+
+export default defineConfig({
+  // Specify the test environment
+  test: {
+    // Use jsdom environment
+    environment: 'jsdom',
+    // Setup files to be run before each test
+    // setupFiles: ['./vitest.setup.js'],
+    
+    // Import assertion library or any global setup
+    globals: true,
+
+    // Add react plugin
+    plugins: [react()],
+
+    // Enable if you're using React 18's server components or need top-level await support
+    // ssr: true,
+  }
 })
- 
-// Add any custom config to be passed to Jest
-/** @type {import('jest').Config} */
-const config = {
-  // Add more setup options before each test is run
-  // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
- 
-  testEnvironment: 'jest-environment-jsdom',
-}
- 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-export default createJestConfig(config)
 ```
 
 Y con el siguiente comando podremos añadir un comando test a npm:
 
 ```bash
-npm pkg set scripts.test="jest"
+npm pkg set scripts.test="vitest"
 ```
 
 !!! question "Ejercicio"
     Se deja como ejercicio, guardar los cambios en git con la configuración de
-    jest y siguiendo conventional commits para el mensaje.
+    Vitest y siguiendo conventional commits para el mensaje.
 
 !!! tip
     A partir de aquí ya tendríamos una plantilla básica para trabajar con Next.
