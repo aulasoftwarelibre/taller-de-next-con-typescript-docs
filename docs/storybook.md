@@ -131,8 +131,8 @@ Una historia en Storybook es una representación visual y funcional de un compon
 
 Vamos a crear la historia del componente que creamos antes:
 
-```typescript title="stories/components/ThemeSwitcher.stories.ts"
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+```typescript title="stories/components/theme-switcher.stories.ts"
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Meta, StoryObj } from "@storybook/react";
 
 const meta = {
