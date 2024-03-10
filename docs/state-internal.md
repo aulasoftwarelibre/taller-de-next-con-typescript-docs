@@ -10,7 +10,7 @@ sustituyendo a la variable counter así:
 ```ts
 import { useState } from 'react'
 
-export default function Counter({ id, step }: CounterProps) {
+export function Counter({ id, step }: CounterProperties) {
 
   const [counter, setCounter] = useState(0)
 ```
@@ -57,14 +57,14 @@ Vamos a crear los siguientes archivos.
 
 ### Componente Menu
 
-```ts title="src/components/Menu/Menu.tsx"
+```ts title="src/components/menu/menu.tsx"
 'use client'
 
 import { Navbar, NavbarBrand, NavbarContent } from '@nextui-org/react'
 
-import ThemeSwitcher from '@/components/ThemeSwitcher'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
-export default function Menu() {
+export function Menu() {
   return (
     <Navbar position="static">
       <NavbarBrand>Curso de React</NavbarBrand>

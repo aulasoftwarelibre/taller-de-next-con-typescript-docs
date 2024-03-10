@@ -102,7 +102,7 @@ Para poder ver en funcionamiento el selector de tema claro/oscuro, vamos a crear
 
 Para eso crearemos el siguiente componente:
 
-```typescript title="src/components/ThemeSwitcher/ThemeSwitcher.tsx"
+```typescript title="src/components/theme-switcher/theme-switcher.tsx"
 "use client";
 
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
@@ -110,7 +110,7 @@ import { Switch } from "@nextui-org/react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-export default function ThemeSwitcher() {
+export function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false); // (1)!
   const { theme, setTheme } = useTheme(); // (2)!
 
@@ -139,22 +139,20 @@ export default function ThemeSwitcher() {
 
 Y a continuación vamos a crear un fichero `index.ts` en ese directorio:
 
-```typescript title="src/components/ThemeSwitcher/index.ts"
-export { default } from './ThemeSwitcher'
+```typescript title="src/components/theme-switcher/index.ts"
+export * from './theme-switcher'
 ```
 
 !!! note
 
-    En React, los componentes pueden organizarse de diferentes maneras. Pueden colocarse directamente en el directorio `components`; dentro de un directorio
-    con el nombre del componente y en un archivo index.tsx o como en el ejemplo, utilizando archivos `index.ts` para exportar componentes de manera centralizada. La elección depende del proyecto y las preferencias del equipo.
+    En React, los componentes pueden organizarse de diferentes maneras. Pueden colocarse directamente en el directorio `components`; dentro de un directorio con el nombre del componente y en un archivo index.tsx o, como en el ejemplo, utilizando archivos `index.ts` para exportar componentes de manera centralizada. La elección depende del proyecto y las preferencias del equipo.
     
-
 
 Vamos a probar a añadir nuestro componente a la pagina principal:
 
 ```typescript title="src/app/page.tsx" hl_lines="2 13"
 import Image from 'next/image'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
 export default function Home() {
   return (
