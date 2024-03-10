@@ -9,7 +9,7 @@ actualiza. En este ejemplo los vamos a separar.
 
 Este archivo define las constantes `INCREMENT`, `DECREMENT`, y `RESET` que representan las acciones posibles en el contexto del contador. Luego, define los tipos de datos relacionados con el estado del contador y las acciones que pueden modificarlo. Esto proporciona una estructura sólida para la gestión del estado del contador y las actualizaciones asociadas.
 
-```ts title="src/state/AdvancedCounterProvider/types.ts"
+```ts title="src/state/advanced-counter-provider/types.ts"
 export const INCREMENT = Symbol()
 export const DECREMENT = Symbol()
 export const RESET = Symbol()
@@ -40,7 +40,7 @@ export type CounterActions =
 
 En este archivo, se crean dos contextos: `CounterStateContext` y `CounterDispatcherContext`. El primero almacena el estado actual del contador, mientras que el segundo almacena la función del dispatcher que se utilizará para modificar el estado. Separar estos dos contextos permite un control más preciso del estado y sus actualizaciones.
 
-```ts title="src/state/AdvancedCounterProvider/context.ts"
+```ts title="src/state/advanced-counter-provider/context.ts"
 import React from 'react'
 
 import { CounterDispatcher, CounterState } from './types'
@@ -58,7 +58,7 @@ Este archivo define el reducer, que es una función que toma el estado actual y 
 No debemos modificarlo, solo devolver el nuevo valor. Cuidado cuando se actualicen
 objectos porque estos se suelen copiar por referencia.
 
-```ts title="src/state/AdvancedCounterProvider/reducers.ts"
+```ts title="src/state/advanced-counter-provider/reducers.ts"
 import React from 'react'
 
 import {
@@ -97,10 +97,10 @@ export const reducer: React.Reducer<CounterState, CounterActions> = (
 Aquí se encuentra el hook personalizado `useAdvancedCounter`, que utiliza los contextos `CounterStateContext` y `CounterDispatcherContext` para acceder al estado del contador y las funciones de modificación. Este hook simplifica la interacción con el contexto del contador al proporcionar métodos como `incrementCounter`, `decrementCounter`, y `resetCounter` que pueden ser utilizados en componentes que necesiten interactuar con el estado del contador.
 
 
-```ts title="src/state/AdvancedCounterProvider/hooks.ts"
+```ts title="src/state/advanced-counter-provider/hooks.ts"
 import React, { MouseEventHandler, useCallback } from 'react'
 
-import { CounterDispatcherContext, CounterStateContext } from './contexts'
+import { CounterDispatcherContext, CounterStateContext } from './context'
 import { DECREMENT, INCREMENT, RESET } from './types'
 
 export const useAdvancedCounter = () => {
@@ -148,13 +148,13 @@ export const useAdvancedCounter = () => {
 
 Este componente es el proveedor de contexto para el contador avanzado. Utiliza el reducer definido en `reducers.ts` para administrar el estado del contador y proporciona los contextos `CounterStateContext` y `CounterDispatcherContext` para que los componentes descendientes puedan acceder al estado y las funciones de modificación.
 
-```ts title="src/state/AdvancedCounterProvider/AdvancedCounterProvider.tsx"
+```ts title="src/state/advanced-counter-provider/advanced-counter-provider.tsx"
 import React from 'react'
 
-import { CounterDispatcherContext, CounterStateContext } from './contexts'
+import { CounterDispatcherContext, CounterStateContext } from './context'
 import { reducer } from './reducers'
 
-export default function AdvancedCounterProvider({
+export function AdvancedCounterProvider({
   children,
 }: {
   children: React.ReactNode
@@ -173,8 +173,8 @@ export default function AdvancedCounterProvider({
 
 Este archivo exporta el `AdvancedCounterProvider` y el hook personalizado `useAdvancedCounter`, lo que facilita su importación en otros archivos de la aplicación sin tener que preocuparse por las rutas de los archivos.
 
-```ts title="src/state/AdvancedCounterProvider/index.ts"
-export { default } from './AdvancedCounterProvider'
+```ts title="src/state/advanced-counter-provider/index.ts"
+export { AdvancedCounterProvider } from './advanced-counter-provider'
 export { useAdvancedCounter } from './hooks'
 ```
 
@@ -189,7 +189,7 @@ Recordad que hay que agregar el contexto:
 'use client'
 
 import Menu from '@/components/Menu'
-import AdvancedCounterProvider from '@/state/AdvancedCounterProvider'
+import AdvancedCounterProvider from '@/state/advanced-counter-provider'
 import CounterProvider from '@/state/CounterProvider'
 
 export default function CounterLayout({
@@ -214,14 +214,14 @@ export default function CounterLayout({
 
 Y ahora creamos el nuevo componente:
 
-```ts title="src/components/AdvancedCounter/types.ts"
-export interface AdvancedCounterProps {
+```ts title="src/components/advanced-counter/types.ts"
+export interface AdvancedCounterProperties {
   id: number
   step: number
 }
 ```
 
-```ts title="src/components/AdvancedCounter/AdvancedCounter.tsx"
+```ts title="src/components/advanced-counter/advanced-counter.tsx"
 'use client'
 
 import {
@@ -239,11 +239,11 @@ import {
   CardHeader,
 } from '@nextui-org/react'
 
-import { useAdvancedCounter } from '@/state/AdvancedCounterProvider'
+import { useAdvancedCounter } from '@/state/advanced-counter-provider'
 
-import { AdvancedCounterProps } from './types'
+import { AdvancedCounterProperties } from './types'
 
-export default function AdvancedCounter({ id, step }: AdvancedCounterProps) {
+export default function AdvancedCounter({ id, step }: AdvancedCounterProperties) {
   const { counter, decrementCounter, incrementCounter, resetCounter } =
     useAdvancedCounter()
 
@@ -339,14 +339,14 @@ export default function AdvancedCounter({ id, step }: AdvancedCounterProps) {
 }
 ```
 
-```ts title="src/components/AdvancedCounter/index.ts"
-export { default } from './AdvancedCounter'
+```ts title="src/components/advanced-counter/index.ts"
+export * from './advanced-counter'
 ```
 
 Y por último cargamos el componente en la página:
 
 ```ts title="src/app/counter/page.tsx"
-import AdvancedCounter from '@/components/AdvancedCounter'
+import AdvancedCounter from '@/components/advanced-counter'
 import Counter from '@/components/Counter'
 import CounterContainerContext from '@/components/CounterContainerContext'
 import CounterContainerShared from '@/components/CounterContainerShared'

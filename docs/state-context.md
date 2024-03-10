@@ -12,7 +12,7 @@ Un contexto en React consta generalmente de tres partes clave:
 
 Este archivo define los tipos de datos relacionados con el contexto del contador. Define una interfaz `CounterState` que incluye un campo `counter` que representa el valor del contador y una función `setCounter` que se utiliza para actualizar ese valor:
 
-```ts title="src/state/CounterProvider/types.ts"
+```ts title="src/state/counter-provider/types.ts"
 export type CounterState = {
   counter: number
   setCounter: (value: number) => void
@@ -29,7 +29,7 @@ export type CounterState = {
 
 En este archivo, se utiliza la función `createContext` de React para crear el contexto. Se crea un contexto llamado `CounterStateContext` que inicialmente se establece como `undefined`. Este contexto actuará como un contenedor para los datos y las funciones relacionadas con el contador:
 
-```ts title="src/state/CounterProvider/context.ts"
+```ts title="src/state/counter-provider/context.ts"
 import { createContext } from 'react'
 
 import { CounterState } from './types'
@@ -41,12 +41,12 @@ export const CounterStateContext = createContext<CounterState | undefined>(
 
 El componente `CounterProvider` es el proveedor de contexto. Utiliza el hook `useState` para crear y mantener el estado del contador, con un valor inicial de 0. Luego, utiliza el contexto `CounterStateContext.Provider` para proporcionar el valor del contador y la función `setCounter` a cualquier componente descendiente que consuma este contexto.
 
-```ts title="src/state/CounterProvider/CounterProvider.tsx"
+```ts title="src/state/counter-provider/counter-provider.tsx"
 import { useState } from 'react'
 
 import { CounterStateContext } from './context'
 
-export default function CounterProvider({
+export function CounterProvider({
   children,
 }: {
   children: React.ReactNode
@@ -63,7 +63,7 @@ export default function CounterProvider({
 
 Este archivo contiene un hook personalizado llamado useCounter. Este hook se utiliza para consumir el contexto `CounterStateContext` y proporciona una interfaz para acceder al valor del contador y las funciones de incremento y reinicio. Si se utiliza fuera del contexto del proveedor, arrojará un error para asegurarse de que se utilice correctamente.
 
-```ts title="src/state/CounterProvider/hooks.ts"
+```ts title="src/state/counter-provider/hooks.ts"
 import { useCallback, useContext } from 'react'
 
 import { CounterStateContext } from './context'
@@ -94,8 +94,8 @@ export const useCounter = () => {
 
 Este archivo exporta el `CounterProvider` y el hook `useCounter`, lo que facilita su importación en otros archivos de la aplicación sin tener que preocuparse por las rutas de los archivos.
 
-```ts title="src/state/CounterProvider/index.ts"
-export { default } from './CounterProvider'
+```ts title="src/state/counter-provider/index.ts"
+export { CounterProvider } from './counter-provider'
 export { useCounter } from './hooks'
 ```
 
@@ -108,8 +108,8 @@ Es lo que vamos a hacer. Actualizamos el fichero `src/app/counter/layout.tsx`.
 ```ts title="src/app/counter/layout.tsx"
 'use client'
 
-import Menu from '@/components/Menu'
-import CounterProvider from '@/state/CounterProvider'
+import { Menu } from '@/components/menu'
+import { CounterProvider } from '@/state/counter-provider'
 
 export default function CounterLayout({
   children,
@@ -135,14 +135,14 @@ Ahora tenemos un custom hook que podemos usar como usabamos `useState`. Vamos
 a hacer un ejemplo rápido con `StatelessCounter`. Podemos ver como nuestro hook
 nos proporciona el estado y los métodos que lo actualizan:
 
-```ts title="src/components/CounterContainerContext/CounterContainerContext.tsx"
+```ts title="src/components/stateless-counter/stateless-counter-context-container.tsx"
 'use client'
 
-import { useCounter } from '@/state/CounterProvider'
+import { useCounter } from '@/state/counter-provider'
 
-import StatelessCounter from '../StatelessCounter'
+import { StatelessCounter } from './stateless-counter'
 
-export default function CounterContainerContext() {
+export function StatelessCounterCounterContext() {
   const { counter, onIncrement, onReset } = useCounter()
 
   return (
@@ -162,8 +162,10 @@ export default function CounterContainerContext() {
 }
 ```
 
-```ts title="src/components/CounterContainerContext/index.tsx"
-export { default } from './CounterContainerContext'
+```ts title="src/components/stateless-counter/index.ts"
+export * from './stateless-counter'
+export * from './stateless-counter-container'
+export * from './stateless-counter-context-container'
 ```
 
 !!! question "Ejercicio"
@@ -171,8 +173,8 @@ export { default } from './CounterContainerContext'
     Puedes crear un nuevo componente ContextCounter que use internamente `useCounter`
     como el original usaba `useState`. Sería similar a nuestro primer componente Counter, de hecho usaría el mismo contrato:
 
-    ```ts title="src/components/ContextCounter/types.ts"
-    export interface CounterProps {
+    ```ts title="src/components/context-counter/types.ts"
+    export interface CounterProperties {
       id: number
       step: number
     }
@@ -181,9 +183,11 @@ export { default } from './CounterContainerContext'
 Y por último cargamos nuestros contadores en la página:
 
 ```ts title="src/app/counter/page.tsx"
-import Counter from '@/components/Counter'
-import CounterContainerContext from '@/components/CounterContainerContext'
-import CounterContainerShared from '@/components/CounterContainerShared'
+import { Counter } from '@/components/counter'
+import {
+  StatelessCounterContainer,
+  StatelessCounterCounterContext,
+} from '@/components/stateless-counter'
 
 export default function CounterPage() {
   return (
@@ -195,12 +199,13 @@ export default function CounterPage() {
         ))}
       </div>
       <h2>Stateless Counters</h2>
-      <CounterContainerShared />
+      <StatelessCounterContainer />
       <h2>Context Counters</h2>
-      <CounterContainerContext />
+      <StatelessCounterCounterContext />
     </div>
   )
 }
+
 ```
 
 ## Conclusión

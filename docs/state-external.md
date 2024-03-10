@@ -16,8 +16,8 @@ evitar perder el trabajo que teníamos hecho.
 
 Creamos el contrato de las propiedades:
 
-```ts title="src/components/StatelessCounter/types.ts"
-export interface StatelessCounterProps {
+```ts title="src/components/stateless-counter/types.ts"
+export interface StatelessCounterProperties {
   counter: number
   id: number
   onIncrement: (amount: number) => void
@@ -34,7 +34,7 @@ export interface StatelessCounterProps {
     La función `onIncrement` suma al valor de counter el valor indicado.
     La función `onReset` resetea el valor a cero.
 
-    Haz los ficheros: `StatelessCounter.tsx`, `index.tsx` y `StatelessCounter.stories.ts`.
+    Haz los ficheros: `stateless-counter.tsx`, `index.tsx` y `stateless-counter.stories.ts`.
     El fichero de Storybook no necesita como argumento el `onIncrement` ni `onReset`
     porque lo inyecta automáticamente.
 
@@ -43,7 +43,7 @@ export interface StatelessCounterProps {
 
 Y ahora el resto de ficheros del componente:
 
-```ts title="src/components/StatelessCounter/StatelessCounter.tsx"
+```ts title="src/components/stateless-counter/stateless-counter.tsx"
 'use client'
 
 import {
@@ -61,15 +61,15 @@ import {
   CardHeader,
 } from '@nextui-org/react'
 
-import { StatelessCounterProps } from './types'
+import { StatelessCounterProperties } from './types'
 
-export default function StatelessCounter({
+export function StatelessCounter({
   counter,
   id,
   onIncrement,
   onReset,
   step,
-}: StatelessCounterProps) {
+}: StatelessCounterProperties) {
   return (
     <Card className="w-[240px] bg-gradient-to-br from-violet-500 to-fuchsia-500">
       <CardHeader className="flex-col !items-start">
@@ -158,16 +158,16 @@ export default function StatelessCounter({
 }
 ```
 
-```ts title="src/components/StatelessCounter/index.ts"
-export { default } from './StatelessCounter'
+```ts title="src/components/stateless-counter/index.ts"
+export * from './stateless-counter'
 ```
 
 Y por último la historia:
 
-```ts title="src/stories/components/StatelessCounter.stories.ts"
+```ts title="stories/components/stateless-counter.stories.ts"
 import { Meta, StoryObj } from '@storybook/react'
 
-import StatelessCounter from '@/components/StatelessCounter'
+import { StatelessCounter } from '@/components/stateless-counter'
 
 const meta = {
   component: StatelessCounter,
@@ -201,12 +201,14 @@ React Component.
 
 Es mejor crear un componente que contenga a nuestros contadores sin estado:
 
-```ts title=""
+```ts title="src/components/stateless-counter/stateless-counter-container.tsx"
+'use client'
+
 import { useCallback, useState } from 'react'
 
-import StatelessCounter from '../StatelessCounter'
+import { StatelessCounter } from './stateless-counter'
 
-export default function CounterContainerShared() {
+export function StatelessCounterContainer() {
   const [counter, setCounter] = useState(0)
 
   const onIncrement = useCallback(
@@ -233,16 +235,17 @@ export default function CounterContainerShared() {
 }
 ```
 
-```ts title="src/components/CounterContainerShared/index.ts"
-export { default } from './CounterContainerShared'
+```ts title="src/components/stateless-counter/index.ts"
+export * from './stateless-counter'
+export * from './stateless-counter-container'
 ```
 
 Y añadimos el componente a nuestra página:
 
 
 ```ts title="src/app/counter/page.tsx"
-import Counter from '@/components/Counter'
-import CounterContainerShared from '@/components/CounterContainerShared'
+import { Counter } from '@/components/counter'
+import { StatelessCounterContainer } from '@/components/stateless-counter'
 
 export default function CounterPage() {
   return (
@@ -254,7 +257,7 @@ export default function CounterPage() {
         ))}
       </div>
       <h2>Stateless Counters</h2>
-      <CounterContainerShared />
+      <StatelessCounterContainer />
     </div>
   )
 }
