@@ -51,7 +51,7 @@ export function Counter({ id, step }: CounterProperties) {
           <Button
             isIconOnly
             size="md"
-            aria-label="Decrement counter with delay"
+            aria-label="Decrement counter with step"
           >
             <ChevronDoubleLeftIcon
               className="text-gray-600 dark:text-gray-400"
@@ -88,7 +88,7 @@ export function Counter({ id, step }: CounterProperties) {
           <Button
             isIconOnly
             size="md"
-            aria-label="Increment counter with delay"
+            aria-label="Increment counter with step"
           >
             <ChevronDoubleRightIcon
               className="text-gray-600 dark:text-gray-400"
