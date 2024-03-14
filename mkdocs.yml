@@ -127,6 +127,8 @@ nav:
     - Componentes sin estado: state-external.md
     - Context API: state-context.md
     - Uso de reducers: state-reducer.md
+  - Interacción con el backend:
+    - Integración con servicios REST: api-rest.md
   - Seguridad:
     - Introducción: security.md
     - Instalar NextAuth: security-next-auth.md
