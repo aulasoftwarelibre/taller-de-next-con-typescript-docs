@@ -8,6 +8,19 @@
 Este taller forma parte de las actividades del [Aula de Software Libre de la
 Universidad de Córdoba](https://www.uco.es/aulasoftwarelibre).
 
+!!! example "Plantilla"
+
+    Existe una plantilla que incluye todo el capítulo [Crear el proyecto base](new-project.md) completo. Si lo deseas
+    puedes usarla para tener el sistema exactamente configurado como lo tenemos en el tutorial.
+
+    La plantilla, además, se puede ejecutar directamente en Codespaces por si quieres empezar a trabajar.
+
+    Puedes clonar la plantilla desde la web del repositorio: [https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-template](https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-template)
+
+    O abrirla directamente pulsando aquí:
+
+    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/aulasoftwarelibre/taller-de-next-con-typescript-template)
+
 
 ## Agradecimientos
 
