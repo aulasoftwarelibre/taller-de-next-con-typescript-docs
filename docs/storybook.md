@@ -19,12 +19,6 @@ npx storybook@latest init -t nextjs
     nextjs con el parámetro `-t nextjs`.
 
 
-Seleccionaremos todas las respuestas por defecto. Con esto ya tendremos una serie de componentes básicos para que podamos ver su funcionamiento:
-
-```bash
-npm run storybook
-```
-
 !!! info
     La primera vez que se instala se inicia solo y nos muestra un tutorial.
 
@@ -33,14 +27,21 @@ Se nos abrirá esta página con algunos componentes de ejemplo:
 ![Landing page de Storybook](images/storybook-landingpage.png)
 
 
-!!! warning
-    Storybook crea una serie de historias de ejemplo en el directorio `src/stories`. Recuerda no guardarlas en git.
-
 Para tener soporte de tema oscuro, necesitamos también instalar el siguiente paquete:
 
 ```bash
 npm install --save-dev @storybook/addon-themes
 ```
+
+!!! info
+
+    Para instalar el nuevo plugin, cierra el servicio de storybook que tienes abierto con ++control+c++, y cuando 
+    termines de configurarlo puedes volver a ejecutar storybook con esta orden:
+
+    ```bash
+    npm run storybook
+    ```
+
 
 ## Configuración de Storybook
 
@@ -55,18 +56,19 @@ componentes.
 Vamos a empezar por el entorno de typescript. Necesitamos que Storybook entienad los paths que tenemos configurados en el archivo `tsconfig.json`.
 También vamos a aprovechar para mover la carpeta de historias `stories` a la raíz del repositorio:
 
-```typescript title=".storybook/main.ts" hl_lines="2 5 11 20-29" 
+```typescript title=".storybook/main.ts" hl_lines="2 12 21-30" 
 import type { StorybookConfig } from "@storybook/nextjs";
 import path from "path";
 
 const config: StorybookConfig = {
-  stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
+  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
   addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-onboarding",
-    "@storybook/addon-interactions",
-    "@storybook/addon-themes",
+    '@storybook/addon-onboarding',
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@chromatic-com/storybook',
+    '@storybook/addon-interactions',
+    '@storybook/addon-themes',
   ],
   framework: {
     name: "@storybook/nextjs",
@@ -94,31 +96,30 @@ export default config;
 A continuación vamos a cargar los providers a la hora de visualizar los 
 componentes:
 
-```typescript title=".storybook/preview.ts" linenums="1" hl_lines="1 6-15"
-import "@/app/globals.css";
+```typescript title=".storybook/preview.ts" hl_lines="1-3 7-15"
+import '@/app/globals.css'
 
-import type {Preview} from '@storybook/react'
-import {withThemeByClassName} from '@storybook/addon-themes';
+import { withThemeByClassName } from '@storybook/addon-themes'
+import type { Preview } from '@storybook/react'
 
 const preview: Preview = {
-    decorators: [
-        withThemeByClassName({
-            themes: {
-                light: 'light',
-                dark: 'dark',
-            },
-            defaultTheme: 'light',
-        }),
-    ],
-    parameters: {
-        actions: {argTypesRegex: '^on[A-Z].*'},
-        controls: {
-            matchers: {
-                color: /(background|color)$/i,
-                date: /Date$/i,
-            },
-        },
+  decorators: [
+    withThemeByClassName({
+      themes: {
+        light: 'light',
+        dark: 'dark',
+      },
+      defaultTheme: 'light',
+    }),
+  ],
+  parameters: {
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/i,
+      },
     },
+  },
 }
 
 export default preview
@@ -131,13 +132,17 @@ Una historia en Storybook es una representación visual y funcional de un compon
 
 Vamos a crear la historia del componente que creamos antes:
 
-```typescript title="stories/components/theme-switcher.stories.ts"
+```typescript title="src/stories/components/theme-switcher.stories.ts"
 import { Meta, StoryObj } from '@storybook/react'
 
 import { ThemeSwitcher } from '@/components/theme-switcher'
 
 const meta = {
   component: ThemeSwitcher,
+  parameters: {
+    layout: 'centered',
+  },
+  tags: ['autodocs'],
   title: 'Components/ThemeSwitcher',
 } satisfies Meta<typeof ThemeSwitcher>
 
@@ -147,10 +152,6 @@ type Story = StoryObj<typeof meta>
 export const Basic: Story = {}
 ```
 
-!!! warning
-    Se ha cambiado la configuración para cargar las historias desde `/stories` en vez de `/src/stories`. Las historias que se han creado por
-    defecto las puedes eliminar o moverlas a la nueva carpeta.
-
 Y aparecerá una nueva sección llamada componentes que tendrá nuestra historia. 
 
 Ahora veremos nuestra historia de forma correcta. Podemos ya incluso borrar los componentes de ejemplo.
@@ -159,4 +160,6 @@ Ahora veremos nuestra historia de forma correcta. Podemos ya incluso borrar los 
 
 !!! question "Ejercicio"
     Guarda los cambios que hemos hecho y la historia que hemos creado en git.
-    No guardes los componentes de ejemplo.
+    Storybook crea una serie de historias de ejemplo en el directorio `src/stories`.
+    Recuerda no guardarlas en git.
+

@@ -1,4 +1,4 @@
-En este capítulo, aprenderemos a crear un nuevo proyecto de React utilizando Next.js y el framework de diseño NextUI. React es una biblioteca de JavaScript ampliamente utilizada para construir interfaces de usuario interactivas, mientras que Next.js es un framework de React que facilita la creación de aplicaciones web avanzadas con rutas y renderización del lado del servidor. NextUI es un marco de diseño que proporciona componentes de interfaz de usuario preestilizados y personalizables, lo que acelera el proceso de diseño y desarrollo.
+En este capítulo, aprenderemos a crear un nuevo proyecto de React utilizando Next.js y el framework de diseño NextUI. React es una biblioteca de JavaScript ampliamente utilizada para construir interfaces de usuario interactivas, mientras que Next.js es un framework de React que facilita la creación de aplicaciones web avanzadas con rutas y renderización del lado del servidor. NextUI es una biblioteca de componentes que proporciona componentes de interfaz de usuario preestilizados y personalizables, lo que acelera el proceso de diseño y desarrollo.
 
 ## Instalación
 
@@ -6,7 +6,7 @@ Crear un boilerplate desde cero para hacer funcionar múltiples herramientas de 
 
 ## Dependencias
 
-### Frameworks: NextJS
+### Frameworks: Next.js
 
 Aunque es posible agregar React a un proyecto existente o crear una aplicación desde cero, la documentación oficial de React aconseja considerar el uso de un framework como Next.js para proyectos web más grandes. Esto se debe a que los frameworks proporcionan una estructura y herramientas adicionales que facilitan el desarrollo, el enrutamiento y la optimización del rendimiento de la aplicación.
 

@@ -128,10 +128,11 @@ npm run lint -- --fix
     {
       "editor.codeActionsOnSave": {
         "source.fixAll": "always",
-        "source.organizeImports": "always"
+        "source.organizeImports": "explicit"
       },
       "editor.defaultFormatter": "esbenp.prettier-vscode",
-      "editor.formatOnSave": true
+      "editor.formatOnSave": true,
+      "css.lint.unknownAtRules": "ignore"
     }
     ```
 
@@ -151,7 +152,9 @@ npm run lint -- --fix
       "recommendations": [
         "esbenp.prettier-vscode",
         "vitest.explorer",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "usernamehw.errorlens"
       ]
     }
     ```
@@ -268,26 +271,49 @@ npm install --save-dev vitest @testing-library/react @vitejs/plugin-react jsdom
 
 Y creamos el archivo de configuración:
 
-```js title="vitest.config.mjs"
+```ts title="vitest.config.mts"
+/* eslint-disable unicorn/prefer-module */
+import path from 'node:path'
+
+import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
+  // Add react plugin
+  plugins: [react()],
+
+  // Configure nextjs default paths
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+
   // Specify the test environment
   test: {
     // Use jsdom environment
     environment: 'jsdom',
-    // Setup files to be run before each test
-    // setupFiles: ['./vitest.setup.js'],
-    
+
     // Import assertion library or any global setup
     globals: true,
 
-    // Add react plugin
-    plugins: [react()],
+    // Setup files to be run before each test
+    setupFiles: ['./vitest.setup.mts'],
+  },
+})
+```
 
-    // Enable if you're using React 18's server components or need top-level await support
-    // ssr: true,
-  }
+A continuación creamos el siguiente fichero:
+
+```ts title="vitest.setup.mts"
+import * as matchers from '@testing-library/jest-dom/matchers'
+import { cleanup } from '@testing-library/react'
+import { afterEach, expect } from 'vitest'
+
+expect.extend(matchers)
+
+afterEach(() => {
+  cleanup()
 })
 ```
 
@@ -296,6 +322,31 @@ Y con el siguiente comando podremos añadir un comando test a npm:
 ```bash
 npm pkg set scripts.test="vitest"
 ```
+
+### Crear un test de ejemplo
+
+Para comprobar que vitest funciona correctamente vamos a crear un pequeño test. Si usas la plantilla en un futuro
+este ya no te servirá, así que recuerda actualizarlo.
+
+```ts title="src/app/page.spec.tsx"
+import { render, screen } from '@testing-library/react'
+import { expect, test } from 'vitest'
+
+import Page from './page'
+
+test('App Router: Works with Server Components', () => {
+  render(<Page />)
+  expect(screen.getByRole('main')).toBeDefined()
+})
+```
+
+Y a continuación ejecutamos las pruebas para comprobar que se ejecuta sin problemas:
+
+```bash
+npm run test
+```
+
+Por defecto vitest se ejecuta en modo `watch`. Eso significa que al terminar de pasar los test no termina, sino que se queda observando si los ficheros cambian para volver a ejecutarlos. Resulta muy útil si haces TDD. Para terminar simplemente pulsa ++control+c++ en la consola.
 
 !!! question "Ejercicio"
     Se deja como ejercicio, guardar los cambios en git con la configuración de
