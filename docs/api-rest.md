@@ -50,10 +50,11 @@ Podemos acceder desde el navegador, que por defecto hace peticiones GET, y visua
 Para crear datos, necesitamos usar POST. No podemos usar el navegador, pero podemos usar un cliente como `curl`:
 
 !!! example
-    Crear un nuevo contador
+    Vamos a crear un par de contadores
 
     ```shell
-    curl -X POST http://localhost:4000/counters --json '{"value": 0}'
+    curl -X POST http://localhost:4000/counters --json '{"id": "2", "value": 0}'
+    curl -X POST http://localhost:4000/counters --json '{"id": "3", "value": -10}'
     ```
 
 Para actualizar datos, tendremos que usar la url del contador. Dependiendo del servidor, deberemos usar POST, PUT o PATCH.
@@ -71,83 +72,130 @@ Para actualizar datos, tendremos que usar la url del contador. Dependiendo del s
     curl -X PUT http://localhost:4000/counters/2 --json '{"value": 10}'
     ```
 
+    Podemos ver ahora que deberíamos tener tres contadores:
+
+      ```shell
+      curl -X GET http://localhost:4000/counters
+      ```
+
 ## Accediendo a los datos del servidor desde React
 
 Para manejar las solicitudes HTTP de manera efectiva y eficiente en React, podemos utilizar la combinación de Axios para realizar las peticiones y la librería SWR para el fetching y caching de datos. Esto nos permite crear aplicaciones más rápidas y con mejor respuesta al usuario.
 
-### Instalación de Axios y SWR
+### Instalación de SWR
 
-Primero, necesitas instalar `axios` para manejar las peticiones HTTP y `swr` para el manejo de datos. Ejecuta el siguiente comando en tu terminal para instalar ambas librerías:
+Primero, instala `swr`, que nos ayudará con el fetching, el cacheo y la revalidación de datos. Ejecuta el siguiente comando en tu terminal:
 
 ```shell
-npm add axios swr
+npm add swr
 ```
 
-Para simplificar las peticiones HTTP y establecer una URL base para todas las llamadas, configura un cliente Axios. Crea un archivo en src/utils/fetcher.ts y define tu cliente Axios y una función fetcher que utilizará SWR para hacer las peticiones.
+Para simplificar las peticiones HTTP vamos a centralizar la URL base del servicio y una función `fetcher` que reutilizaremos desde SWR. Crea el archivo `src/utils/fetcher.ts` con el siguiente contenido.
 
-### Configuración del Cliente Axios
+### Configuración del fetcher
 
 ```ts title="src/utils/fetcher.ts"
-import axios from 'axios'
-
-export const client = axios.create({
-  baseURL: 'http://localhost:4000',
-})
+export const API_BASE_URL = 'http://localhost:4000'
 
 export async function fetcher(url: string) {
-  return client.get(url).then((response) => response.data)
+  const response = await fetch(`${API_BASE_URL}${url}`)
+
+  if (!response.ok) {
+    throw new Error('Request failed')
+  }
+
+  return response.json()
 }
 ```
 
+
 ### Uso de SWR con el Fetcher
 
-Una vez que tienes tu función fetcher definida, puedes usarla con SWR en tus componentes React para acceder a los datos del servidor. SWR manejará automáticamente el caching, la revalidación, y otras optimizaciones.
+Una vez que tienes tu función fetcher definida, puedes usarla con SWR en tus componentes React para acceder a los datos del servidor. SWR manejará automáticamente el caching, la revalidación y otras optimizaciones. Para mantener el ejemplo ordenado, vamos a separar la lógica en un servicio y un hook reutilizable antes de llegar al componente.
 
+### Servicio del contador
+
+```ts title="src/services/counter.ts"
+import { API_BASE_URL } from '@/utils/fetcher'
+
+export async function updateCounter(id: number, value: number) {
+  const response = await fetch(`${API_BASE_URL}/counters/${id}`, {
+    body: JSON.stringify({ value }),
+    headers: { 'Content-Type': 'application/json' },
+    method: 'PATCH',
+  })
+
+  if (!response.ok) {
+    throw new Error('Unable to update counter')
+  }
+
+  return response.json()
+}
 ```
+
+### Hook `useCounter`
+
+```ts title="src/hooks/use-counter.ts"
 'use client'
 
 import useSWR from 'swr'
 
-import { client, fetcher } from '@/utils/fetcher'
+import { fetcher } from '@/utils/fetcher'
+import { updateCounter } from '@/services/counter'
 
-import { CounterProperties } from './types'
-
-async function updateCounter(id: number, value: number) {
-  return await client.patch(`/counters/${id}`, { value })
-}
-
-function useCounter(id: number) {
+export function useCounter(id: number) {
   const { data, isLoading, mutate } = useSWR(`/counters/${id}`, fetcher)
 
   const counter: number = data?.value ?? 0
 
   const onIncrement = async (value: number) => {
-    const {
-      data: { value: updatedValue },
-    } = await updateCounter(id, counter + value)
-    mutate({ ...data, value: updatedValue }, false)
-  }
+    const updated = await updateCounter(id, counter + value)
 
-  const onDecrement = async (value: number) => {
-    const {
-      data: { value: updatedValue },
-    } = await updateCounter(id, counter - value)
-    mutate({ ...data, value: updatedValue }, false)
+    mutate({ ...(data ?? {}), value: updated.value }, false)
   }
 
   const onReset = async () => {
-    const {
-      data: { value: updatedValue },
-    } = await updateCounter(id, 0)
-    mutate({ ...data, value: updatedValue }, false)
+    const updated = await updateCounter(id, 0)
+
+    mutate({ ...(data ?? {}), value: updated.value }, false)
   }
 
-  return { counter, isLoading, onDecrement, onIncrement, onReset }
+  return { counter, isLoading, onIncrement, onReset }
 }
+```
+
+### Componente `Counter`
+
+Vamos a actualizar nuestro componente `Counter` para que ahora use la API en
+vez de almacenar el estado localmente. Si recargamos la página, lo primero que
+notaremos es que ahora los contadores tienen el valor por defecto que les hemos
+colocado. Si usamos los botones para modificarlos y recargamos, el nuevo valor
+se reflejará.
+
+```ts title="src/components/counter/counter.tsx"
+'use client'
+
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  CardFooter,
+  CardHeader,
+  Skeleton,
+} from '@heroui/react'
+import {
+  ArrowPathIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from '@heroicons/react/24/solid'
+
+import { useCounter } from '@/hooks/use-counter'
+import { CounterProperties } from './types'
 
 export function Counter({ id, step }: CounterProperties) {
-  const { counter, isLoading, onDecrement, onIncrement, onReset } =
-    useCounter(id)
+  const { counter, isLoading, onIncrement, onReset } = useCounter(id)
 
   if (isLoading) {
     return (
@@ -173,7 +221,12 @@ export function Counter({ id, step }: CounterProperties) {
       </CardHeader>
       <CardFooter className="justify-center">
         <ButtonGroup>
-          <Button isIconOnly size="md" aria-label="Decrement counter by step">
+          <Button
+            isIconOnly
+            size="md"
+            aria-label="Decrement counter by step"
+            onClick={() => onIncrement(-step * 10)}
+          >
             <ChevronDoubleLeftIcon
               className="text-gray-600 dark:text-gray-400"
               height="1.3rem"
@@ -186,7 +239,7 @@ export function Counter({ id, step }: CounterProperties) {
             isIconOnly
             size="md"
             aria-label="Decrement counter"
-            onClick={() => onDecrement(1)}
+            onClick={() => onIncrement(-step)}
           >
             <ChevronLeftIcon
               className="text-gray-600 dark:text-gray-400"
@@ -211,7 +264,7 @@ export function Counter({ id, step }: CounterProperties) {
             isIconOnly
             size="md"
             aria-label="Increment counter"
-            onClick={() => onIncrement(1)}
+            onClick={() => onIncrement(step)}
           >
             <ChevronRightIcon
               className="text-gray-600 dark:text-gray-400"
@@ -221,7 +274,12 @@ export function Counter({ id, step }: CounterProperties) {
               +{step}
             </div>
           </Button>
-          <Button isIconOnly size="md" aria-label="Increment counter by step">
+          <Button
+            isIconOnly
+            size="md"
+            aria-label="Increment counter by step"
+            onClick={() => onIncrement(step * 10)}
+          >
             <ChevronDoubleRightIcon
               className="text-gray-600 dark:text-gray-400"
               height="1.3rem"
@@ -236,3 +294,5 @@ export function Counter({ id, step }: CounterProperties) {
   )
 }
 ```
+
+Dentro del hook reaprovechamos la misma función `onIncrement` para sumar o restar valores, pasando números negativos cuando queremos decrementar. Así evitamos duplicar lógica y mantenemos el ejemplo centrado en un único flujo de mutación: llamar al endpoint con el nuevo valor y refrescar la caché de SWR.
