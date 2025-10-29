@@ -1,73 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/api-rest/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/api-rest/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/dependencies/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/counter/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/install/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/dependencies/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/new-project/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/heroui/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/nextui/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/install/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/security-next-auth/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/new-project/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/security/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/security-next-auth/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/state-context/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/security/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/state-external/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/state-context/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/state-internal/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/state-external/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/state-reducer/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/state-internal/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/state/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/state-reducer/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
     <url>
-         <loc>https://github.com/aulasoftwarelibre/taller-de-next-con-typescript-docs/storybook/</loc>
-         <lastmod>2024-10-27</lastmod>
-         <changefreq>daily</changefreq>
+         <loc>https://aulasoftwarelibre.github.io/taller-de-next-con-typescript-docs/storybook/</loc>
+         <lastmod>2025-10-29</lastmod>
     </url>
 </urlset>
