@@ -2,385 +2,168 @@ En este capítulo, exploraremos una forma más avanzada de gestionar el estado e
 
 Los reducers son particularmente valiosos en situaciones donde el estado de la aplicación es complejo y necesita ser actualizado de manera controlada. Ejemplos de estos casos incluyen la gestión de formularios con múltiples campos interdependientes, la administración de un carrito de compras en línea con numerosos productos y cantidades, o el control de flujos de datos asincrónicos en aplicaciones que requieren comunicación en tiempo real.
 
-## Contexto avanzado
+## Contexto con reducers
 
-En el anterior ejemplo, el mismo contexto tenia el estado y la función que lo
-actualiza. En este ejemplo los vamos a separar.
+En el anterior ejemplo, el mismo contexto tenía el estado y la función que lo actualiza. En este ejemplo los vamos a separar para que el estado viaje por un contexto y la función `dispatch` por otro.
 
-Este archivo define las constantes `INCREMENT`, `DECREMENT`, y `RESET` que representan las acciones posibles en el contexto del contador. Luego, define los tipos de datos relacionados con el estado del contador y las acciones que pueden modificarlo. Esto proporciona una estructura sólida para la gestión del estado del contador y las actualizaciones asociadas.
+### Acciones
 
-```ts title="src/state/advanced-counter-provider/types.ts"
-export const INCREMENT = Symbol()
-export const DECREMENT = Symbol()
-export const RESET = Symbol()
+Este archivo define las constantes `INCREMENT` y `RESET`, las dos acciones que mantiene el contador para conservar la misma API que vimos en la sección anterior (`onIncrement` y `onReset`). Además describe los tipos asociados a cada acción y expone los action creators que usaremos desde los componentes.
 
-export type CounterState = number
+```ts title="src/state/counter-provider/actions.ts"
+export const INCREMENT = 'counter/increment' as const
+export const RESET = 'counter/reset' as const
 
-export type CounterDispatcher = (action: CounterActions) => void
-
-export interface CounterIncrementAction {
+interface CounterIncrementAction {
   type: typeof INCREMENT
   value: number
 }
 
-export interface CounterDecrementAction {
-  type: typeof DECREMENT
-  value: number
-}
-
-export interface CounterResetAction {
+interface CounterResetAction {
   type: typeof RESET
 }
 
-export type CounterActions =
-  | CounterIncrementAction
-  | CounterDecrementAction
-  | CounterResetAction
+export type CounterAction = CounterIncrementAction | CounterResetAction
+
+export const increment = (value: number): CounterIncrementAction => ({
+  type: INCREMENT,
+  value,
+})
+
+export const reset = (): CounterResetAction => ({ type: RESET })
 ```
 
-En este archivo, se crean dos contextos: `CounterStateContext` y `CounterDispatcherContext`. El primero almacena el estado actual del contador, mientras que el segundo almacena la función del dispatcher que se utilizará para modificar el estado. Separar estos dos contextos permite un control más preciso del estado y sus actualizaciones.
+`INCREMENT` siempre transporta un `value: number`, el mismo paso (`step`) que reciben nuestros componentes. `RESET` no necesita payload porque basta con devolver el estado inicial. Marcamos las constantes con `as const` para que TypeScript trate esas cadenas como literales exactos, de modo que el reducer pueda discriminar las acciones sin comprobaciones adicionales.
 
-```ts title="src/state/advanced-counter-provider/context.ts"
-import React from 'react'
+En los componentes esto se traduce en llamadas muy legibles:
 
-import { CounterDispatcher, CounterState } from './types'
-
-export const CounterStateContext = React.createContext<
-  CounterState | undefined
->(undefined)
-
-export const CounterDispatcherContext = React.createContext<
-  CounterDispatcher | undefined
->(undefined)
+```ts
+dispatch(increment(5)) // equivale a onIncrement(5)
+dispatch(reset()) // equivale a onReset()
 ```
 
-Este archivo define el reducer, que es una función que toma el estado actual y una acción, y devuelve el nuevo estado. El reducer se encarga de gestionar cómo el estado del contador cambia en respuesta a diferentes acciones, como incrementar, decrementar o reiniciar. Esto proporciona un control centralizado y predecible sobre las actualizaciones del estado. El estado, como en el caso del `useState` es inmutable.
-No debemos modificarlo, solo devolver el nuevo valor. Cuidado cuando se actualicen
-objectos porque estos se suelen copiar por referencia.
+Así podemos mantener la interfaz `onIncrement`/`onReset` mientras la implementación interna pasa a Redux-style actions.
 
-```ts title="src/state/advanced-counter-provider/reducers.ts"
-import React from 'react'
+### Reducer
 
-import {
-  CounterActions,
-  CounterState,
-  DECREMENT,
-  INCREMENT,
-  RESET,
-} from './types'
+Este archivo define el reducer, que es una función que toma el estado actual y una acción, y devuelve el nuevo estado. Aquí nos encargamos de gestionar cómo cambia el contador en respuesta a las acciones `INCREMENT` y `RESET`, manteniendo la lógica bien localizada y fácil de testear. El estado, como en el caso del `useState`, es inmutable: no debemos modificarlo, solo devolver el nuevo valor. Cuidado cuando se actualicen objetos porque estos se suelen copiar por referencia.
 
-export const reducer: React.Reducer<CounterState, CounterActions> = (
+```ts title="src/state/counter-provider/reducer.ts"
+import { type CounterAction, INCREMENT, RESET } from './actions'
+
+export type CounterState = number
+export type CounterDispatcher = React.Dispatch<CounterAction>
+
+export const initialCounterState: CounterState = 0
+
+export const reducer: React.Reducer<CounterState, CounterAction> = (
   state,
-  action,
+  action
 ) => {
   switch (action.type) {
     case INCREMENT: {
-      const nextState = state + action.value
+      const step = Number(action.value)
+      return state + step
+    }
 
-      return nextState
-    }
-    case DECREMENT: {
-      const nextState = state - action.value
+    case RESET:
+      return initialCounterState
 
-      return nextState
-    }
-    case RESET: {
-      return 0
-    }
-    default: {
+    default:
       return state
-    }
   }
 }
 ```
+Aquí se encuentra el hook personalizado `useCounter`, que utiliza los contextos `CounterStateContext` y `CounterDispatcherContext` para acceder al estado del contador y a la función `dispatch`. Este hook encapsula la interacción con el contexto y expone la misma interfaz que teníamos con `useState`: `onIncrement` y `onReset`. Así los componentes que ya consumían esas funciones pueden seguir funcionando sin cambios mientras la implementación interna evoluciona.
 
-Aquí se encuentra el hook personalizado `useAdvancedCounter`, que utiliza los contextos `CounterStateContext` y `CounterDispatcherContext` para acceder al estado del contador y las funciones de modificación. Este hook simplifica la interacción con el contexto del contador al proporcionar métodos como `incrementCounter`, `decrementCounter`, y `resetCounter` que pueden ser utilizados en componentes que necesiten interactuar con el estado del contador.
 
+### Hook
 
-```ts title="src/state/advanced-counter-provider/hooks.ts"
-import React, { MouseEventHandler, useCallback } from 'react'
+```ts title="src/state/counter-provider/use-counter.ts"
+import { useCallback, useContext } from 'react'
+import { increment, reset } from './actions'
+import {
+  CounterDispatcherContext,
+  CounterStateContext,
+} from './counter-provider'
 
-import { CounterDispatcherContext, CounterStateContext } from './context'
-import { DECREMENT, INCREMENT, RESET } from './types'
-
-export const useAdvancedCounter = () => {
-  const state = React.useContext(CounterStateContext)
-  const dispatch = React.useContext(CounterDispatcherContext)
+export function useCounter() {
+  const state = useContext(CounterStateContext)
+  const dispatch = useContext(CounterDispatcherContext)
 
   if (state === undefined || dispatch === undefined) {
-    throw new Error('useAdvancedCounter must be used within a CounterProvider')
+    throw new Error('useCounter must be used within a <CounterProvider>')
   }
 
-  const incrementCounter: MouseEventHandler<HTMLButtonElement> = useCallback(
-    ({ currentTarget: { dataset } }) => {
-      dispatch({
-        type: INCREMENT,
-        value: Number(dataset.step),
-      })
+  const incrementCounter = useCallback(
+    (step = 1) => {
+      dispatch(increment(step))
     },
-    [dispatch],
-  )
-
-  const decrementCounter: MouseEventHandler<HTMLButtonElement> = useCallback(
-    ({ currentTarget: { dataset } }) => {
-      dispatch({
-        type: DECREMENT,
-        value: Number(dataset.step),
-      })
-    },
-    [dispatch],
+    [dispatch]
   )
 
   const resetCounter = useCallback(() => {
-    dispatch({
-      type: RESET,
-    })
+    dispatch(reset())
   }, [dispatch])
 
   return {
     counter: state,
-    decrementCounter,
-    incrementCounter,
-    resetCounter,
+    onIncrement: incrementCounter,
+    onReset: resetCounter,
   }
 }
 ```
 
-Este componente es el proveedor de contexto para el contador avanzado. Utiliza el reducer definido en `reducers.ts` para administrar el estado del contador y proporciona los contextos `CounterStateContext` y `CounterDispatcherContext` para que los componentes descendientes puedan acceder al estado y las funciones de modificación.
+### Context provider
 
-```ts title="src/state/advanced-counter-provider/advanced-counter-provider.tsx"
-import React from 'react'
+Cuando el estado y el dispatcher viajan juntos, cualquier cambio en el valor dispara un re-render en todos los componentes que consumen el contexto, aunque solo necesiten la función para lanzar acciones. Al separarlos, los componentes que únicamente despachan acciones no se ven afectados por las variaciones del estado y mantenemos a salvo la interfaz pública (`onIncrement`, `onReset`) que ya conocíamos.
 
-import { CounterDispatcherContext, CounterStateContext } from './context'
-import { reducer } from './reducers'
+Este componente es el proveedor de contexto para el contador. Utiliza el reducer definido en `reducer.ts` para administrar el estado y proporciona los contextos `CounterStateContext` y `CounterDispatcherContext` para que los componentes descendientes puedan acceder al valor y a la función `dispatch`. Separar ambos contextos evita renderizados innecesarios y nos permite conservar la misma firma externa que en el capítulo anterior.
 
-export function AdvancedCounterProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const [state, dispatch] = React.useReducer(reducer, 0)
+
+```ts title="src/state/counter-provider/counter-provider.tsx"
+import { createContext, useReducer } from 'react'
+import {
+  type CounterDispatcher,
+  type CounterState,
+  initialCounterState,
+  reducer,
+} from './reducer'
+
+export const CounterStateContext = createContext<CounterState | undefined>(
+  undefined
+)
+export const CounterDispatcherContext = createContext<
+  CounterDispatcher | undefined
+>(undefined)
+
+export function CounterProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(reducer, initialCounterState)
 
   return (
-    <CounterDispatcherContext.Provider value={dispatch}>
-      <CounterStateContext.Provider value={state}>
+    <CounterStateContext.Provider value={state}>
+      <CounterDispatcherContext.Provider value={dispatch}>
         {children}
-      </CounterStateContext.Provider>
-    </CounterDispatcherContext.Provider>
+      </CounterDispatcherContext.Provider>
+    </CounterStateContext.Provider>
   )
 }
 ```
 
-Este archivo exporta el `AdvancedCounterProvider` y el hook personalizado `useAdvancedCounter`, lo que facilita su importación en otros archivos de la aplicación sin tener que preocuparse por las rutas de los archivos.
-
-```ts title="src/state/advanced-counter-provider/index.ts"
-export { AdvancedCounterProvider } from './advanced-counter-provider'
-export { useAdvancedCounter } from './hooks'
-```
-
-## Nuevo AdvancedCounter
-
-Este nuevo counter requiere explicación adicional, pero antes vamos a crear un
-nuevo componente que aproveche este nuevo contexto.
-
-Recordad que hay que agregar el contexto:
-
-```ts title="src/app/counter/layout.tsx"
-'use client'
-
-import Menu from '@/components/Menu'
-import AdvancedCounterProvider from '@/state/advanced-counter-provider'
-import CounterProvider from '@/state/CounterProvider'
-
-export default function CounterLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <CounterProvider>
-      <AdvancedCounterProvider>
-        <div className="container mx-auto">
-          <div className="flex flex-col gap-2">
-            <Menu />
-            <div>{children}</div>
-          </div>
-        </div>
-      </AdvancedCounterProvider>
-    </CounterProvider>
-  )
-}
-```
-
-Y ahora creamos el nuevo componente:
-
-```ts title="src/components/advanced-counter/types.ts"
-export interface AdvancedCounterProperties {
-  id: number
-  step: number
-}
-```
-
-```ts title="src/components/advanced-counter/advanced-counter.tsx"
-'use client'
-
-import {
-  ArrowPathIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from '@heroicons/react/24/outline'
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  CardFooter,
-  CardHeader,
-} from '@nextui-org/react'
-
-import { useAdvancedCounter } from '@/state/advanced-counter-provider'
-
-import { AdvancedCounterProperties } from './types'
-
-export default function AdvancedCounter({ id, step }: AdvancedCounterProperties) {
-  const { counter, decrementCounter, incrementCounter, resetCounter } =
-    useAdvancedCounter()
-
-  return (
-    <Card className="w-[240px] bg-gradient-to-br from-violet-500 to-fuchsia-500">
-      <CardHeader className="flex-col !items-start">
-        <div className="flex flex-col">
-          <p className="text-tiny text-white/60 uppercase font-bold">
-            Contador #{id}
-          </p>
-          <p className="text-white font-medium text-large">
-            El contador vale {counter}.
-          </p>
-        </div>
-      </CardHeader>
-      <CardFooter className="justify-center">
-        <ButtonGroup>
-          <Button
-            isIconOnly
-            size="md"
-            aria-label="Decrement counter faster"
-            onClick={decrementCounter}
-            data-step={step * 10}
-          >
-            <ChevronDoubleLeftIcon
-              className="text-gray-600 dark:text-gray-400"
-              height="1.3rem"
-            />
-            <div className="absolute right-1 bottom-0 font-bold text-[10px]">
-              -{step * 10}
-            </div>
-          </Button>
-          <Button
-            isIconOnly
-            size="md"
-            aria-label="Decrement counter"
-            onClick={decrementCounter}
-            data-step={step}
-          >
-            <ChevronLeftIcon
-              className="text-gray-600 dark:text-gray-400"
-              height="1.3rem"
-            />
-            <div className="absolute right-1 bottom-0 font-bold text-[10px]">
-              -{step}
-            </div>
-          </Button>
-          <Button
-            isIconOnly
-            size="md"
-            aria-label="Reset counter"
-            onClick={resetCounter}
-          >
-            <ArrowPathIcon
-              className="text-gray-600 dark:text-gray-400"
-              height="1.3rem"
-            />
-          </Button>
-          <Button
-            isIconOnly
-            size="md"
-            aria-label="Increment counter"
-            onClick={incrementCounter}
-            data-step={step}
-          >
-            <ChevronRightIcon
-              className="text-gray-600 dark:text-gray-400"
-              height="1.3rem"
-            />
-            <div className="absolute right-1 bottom-0 font-bold text-[10px]">
-              +{step}
-            </div>
-          </Button>
-          <Button
-            isIconOnly
-            size="md"
-            aria-label="Increment counter faster"
-            onClick={incrementCounter}
-            data-step={step * 10}
-          >
-            <ChevronDoubleRightIcon
-              className="text-gray-600 dark:text-gray-400"
-              height="1.3rem"
-            />
-            <div className="absolute right-1 bottom-0 font-bold text-[10px]">
-              +{step * 10}
-            </div>
-          </Button>
-        </ButtonGroup>
-      </CardFooter>
-    </Card>
-  )
-}
-```
-
-```ts title="src/components/advanced-counter/index.ts"
-export * from './advanced-counter'
-```
-
-Y por último cargamos el componente en la página:
-
-```ts title="src/app/counter/page.tsx"
-import AdvancedCounter from '@/components/advanced-counter'
-import Counter from '@/components/Counter'
-import CounterContainerContext from '@/components/CounterContainerContext'
-import CounterContainerShared from '@/components/CounterContainerShared'
-
-export default function CounterPage() {
-  return (
-    <div className="flex flex-col gap-2">
-      <h2>State Counters</h2>
-      <div className="flex flex-row gap-2">
-        {Array.from({ length: 3 }, (_, id) => (
-          <Counter key={id} id={id} step={1} />
-        ))}
-      </div>
-      <h2>Stateless Counters</h2>
-      <CounterContainerShared />
-      <h2>Context Counters</h2>
-      <CounterContainerContext />
-      <h2>Dispatched Counters</h2>
-      <div className="flex flex-row gap-2">
-        {Array.from({ length: 3 }, (_, id) => (
-          <AdvancedCounter key={id} id={id} step={id + 1} />
-        ))}
-      </div>
-    </div>
-  )
-}
-```
 
 ## Cambios
 
 ¿En qué cambia el uso de reducers con el `useState`? Básicamente la diferencia
 radica en que con `useState` la lógica y la representación están unidas, mientras
-que ahora el componente `AdvancerCounter` no sabe nada de cómo se producen los
+que ahora el componente `StatelessCounterContainer` no sabe nada de cómo se producen los
 cambios, solo indica intenciones.
+
+!!! question
+
+    1. Crea una nueva acción llamada DECREMENT y separa los incrementos de los decrementos.
+    2. Crea un Counter que dentro use el hook `useCounter` con las tres acciones (incremento, decremento y reinicio). 
+
+    El objetivo es que los botones llamen a su correspondiente acción de decremento e incremento.
 
 Ejemplo:
 
