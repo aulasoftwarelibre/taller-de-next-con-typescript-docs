@@ -119,7 +119,7 @@ nav:
     - Introducción: new-project.md
     - Dependencias: dependencies.md
     - Creando el boilerplate: install.md
-    - Configurando NextUI: nextui.md
+    - Configurando HeroUI: heroui.md
     - Storybook: storybook.md
   - Gestión del estado: 
     - Componente contador: state.md
