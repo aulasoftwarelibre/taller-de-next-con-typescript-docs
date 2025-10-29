@@ -130,5 +130,5 @@ nav:
   - Interacción con el backend:
     - Integración con servicios REST: api-rest.md
   - Seguridad:
-    - Introducción: security.md
+    - Conceptos básicos: security.md
     - Instalar NextAuth: security-next-auth.md

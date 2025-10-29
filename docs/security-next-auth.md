@@ -1,4 +1,12 @@
 
+!!! danger
+
+    Next Auth ahora es parte de Better Auth [Ver anuncio]. Con lo que no se recomienda hacer nuevos proyectos con Next Auth.
+    Está sección será reescrita desde cero. Por lo que ahora mismo puede que no te funcione.
+
+    [Ver anuncio]: https://www.better-auth.com/blog/authjs-joins-better-auth
+
+
 NextAuth.js es una librería de autenticación que se integra fácilmente con aplicaciones web basadas en Next.js. Esta potente librería simplifica la implementación de la autenticación de usuarios, incluyendo la autenticación social y el manejo de sesiones. Con NextAuth.js, puedes configurar la autenticación de manera eficiente y segura, permitiendo a los usuarios acceder a tus aplicaciones de forma sencilla a través de múltiples proveedores, como Google, Facebook, GitHub y más.
 
 ## Instalación
