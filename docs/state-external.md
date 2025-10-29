@@ -14,36 +14,26 @@ evitar perder el trabajo que teníamos hecho.
 
 ## Componente StatelessCounter
 
-Creamos el contrato de las propiedades:
+Ahora nuestro componente tiene más propiedades, a las que ya tenía `Counter`
+tenemos que pasarle el valor actual del contador, una función que se llamará para
+indicar que queremos resetear el contador, y otra para indicar que queremos cambiar
+en un valor dado el contador.
 
-```ts title="src/components/stateless-counter/types.ts"
-export interface StatelessCounterProperties {
-  counter: number
+```ts hl_lines="4-6"
+interface StatelessCounterProperties {
   id: number
+  step: number
+  counter: number
   onIncrement: (amount: number) => void
   onReset: () => void
-  step: number
 }
 ```
 
-!!! question "Ejercicio"
-    Si quieres, puedes intentar hacerlo por tu cuenta con lo que ya sabes.
-    Básicamente es copiar el código del componente base (antes de usar el hook)
-    y utilizar el fichero de propiedades anterior.
+Este sería el componente completo, si te fijas, hemos cambiado `setCounter`
+por nuestras funciones:
 
-    La función `onIncrement` suma al valor de counter el valor indicado.
-    La función `onReset` resetea el valor a cero.
 
-    Haz los ficheros: `stateless-counter.tsx`, `index.tsx` y `stateless-counter.stories.ts`.
-    El fichero de Storybook no necesita como argumento el `onIncrement` ni `onReset`
-    porque lo inyecta automáticamente.
-
-    De todas maneras el código resuelto se encuentra a continuación. Tampoco te
-    preocupes si no lo haces exactamente igual, no hay una única solución.
-
-Y ahora el resto de ficheros del componente:
-
-```ts title="src/components/stateless-counter/stateless-counter.tsx"
+```ts title="src/components/counter/stateless-counter.tsx"
 'use client'
 
 import {
@@ -59,9 +49,15 @@ import {
   Card,
   CardFooter,
   CardHeader,
-} from '@nextui-org/react'
+} from '@heroui/react'
 
-import { StatelessCounterProperties } from './types'
+interface StatelessCounterProperties {
+  counter: number
+  id: number
+  onIncrement: (amount: number) => void
+  onReset: () => void
+  step: number
+}
 
 export function StatelessCounter({
   counter,
@@ -71,13 +67,13 @@ export function StatelessCounter({
   step,
 }: StatelessCounterProperties) {
   return (
-    <Card className="w-[240px] bg-gradient-to-br from-violet-500 to-fuchsia-500">
-      <CardHeader className="flex-col !items-start">
+    <Card className="w-60 bg-linear-to-br from-violet-500 to-fuchsia-500">
+      <CardHeader className="items-start! flex-col">
         <div className="flex flex-col">
-          <p className="text-tiny text-white/60 uppercase font-bold">
+          <p className="font-bold text-tiny text-white/60 uppercase">
             Contador #{id}
           </p>
-          <p className="text-white font-medium text-large">
+          <p className="font-medium text-large text-white">
             El contador vale {counter}.
           </p>
         </div>
@@ -85,10 +81,10 @@ export function StatelessCounter({
       <CardFooter className="justify-center">
         <ButtonGroup>
           <Button
-            isIconOnly
-            size="md"
             aria-label="Decrement counter with step"
-            onClick={() => onIncrement(-step * 10)}
+            isIconOnly
+            onPress={() => onIncrement(-step * 10)}
+            size="md"
           >
             <ChevronDoubleLeftIcon
               className="text-gray-600 dark:text-gray-400"
@@ -99,10 +95,10 @@ export function StatelessCounter({
             </div>
           </Button>
           <Button
-            isIconOnly
-            size="md"
             aria-label="Decrement counter"
-            onClick={() => onIncrement(-step)}
+            isIconOnly
+            onPress={() => onIncrement(-step)}
+            size="md"
           >
             <ChevronLeftIcon
               className="text-gray-600 dark:text-gray-400"
@@ -113,10 +109,10 @@ export function StatelessCounter({
             </div>
           </Button>
           <Button
-            isIconOnly
-            size="md"
             aria-label="Reset counter"
-            onClick={onReset}
+            isIconOnly
+            onPress={onReset}
+            size="md"
           >
             <ArrowPathIcon
               className="text-gray-600 dark:text-gray-400"
@@ -124,10 +120,10 @@ export function StatelessCounter({
             />
           </Button>
           <Button
-            isIconOnly
-            size="md"
             aria-label="Increment counter"
-            onClick={() => onIncrement(step)}
+            isIconOnly
+            onPress={() => onIncrement(step)}
+            size="md"
           >
             <ChevronRightIcon
               className="text-gray-600 dark:text-gray-400"
@@ -138,10 +134,10 @@ export function StatelessCounter({
             </div>
           </Button>
           <Button
-            isIconOnly
-            size="md"
-            onClick={() => onIncrement(step * 10)}
             aria-label="Increment counter with step"
+            isIconOnly
+            onPress={() => onIncrement(step * 10)}
+            size="md"
           >
             <ChevronDoubleRightIcon
               className="text-gray-600 dark:text-gray-400"
@@ -158,20 +154,23 @@ export function StatelessCounter({
 }
 ```
 
-```ts title="src/components/stateless-counter/index.ts"
-export * from './stateless-counter'
-```
-
 Y por último la historia:
 
-```ts title="stories/components/stateless-counter.stories.ts"
-import { Meta, StoryObj } from '@storybook/react'
-
-import { StatelessCounter } from '@/components/stateless-counter'
+```ts title="src/stories/components/stateless-counter.stories.ts"
+import type { Meta, StoryObj } from '@storybook/nextjs'
+import { fn } from 'storybook/test'
+import { StatelessCounter } from '@/components/counter/stateless-counter'
 
 const meta = {
   component: StatelessCounter,
+  parameters: {
+    layout: 'centered',
+  },
   title: 'Components/StatelessCounter',
+  args: {
+    onIncrement: fn(),
+    onReset: fn(),
+  },
 } satisfies Meta<typeof StatelessCounter>
 
 export default meta
@@ -201,7 +200,7 @@ React Component.
 
 Es mejor crear un componente que contenga a nuestros contadores sin estado:
 
-```ts title="src/components/stateless-counter/stateless-counter-container.tsx"
+```ts title="src/components/counter/stateless-counter-container.tsx"
 'use client'
 
 import { useCallback, useState } from 'react'
@@ -213,51 +212,58 @@ export function StatelessCounterContainer() {
 
   const onIncrement = useCallback(
     (amount: number) => setCounter(counter + amount),
-    [counter, setCounter],
+    [counter]
   )
 
-  const onReset = useCallback(() => setCounter(0), [setCounter])
+  const onReset = useCallback(() => setCounter(0), [])
 
   return (
     <div className="flex flex-row gap-2">
-      {Array.from({ length: 3 }, (_, id) => (
-        <StatelessCounter
-          key={id}
-          id={id}
-          step={id + 1} // Step incrementa como id + 1
-          counter={counter}
-          onIncrement={onIncrement}
-          onReset={onReset}
-        />
-      ))}
+      <StatelessCounter
+        counter={counter}
+        id={1}
+        onIncrement={onIncrement}
+        onReset={onReset}
+        step={1}
+      />
+      <StatelessCounter
+        counter={counter}
+        id={2}
+        onIncrement={onIncrement}
+        onReset={onReset}
+        step={2}
+      />
+      <StatelessCounter
+        counter={counter}
+        id={3}
+        onIncrement={onIncrement}
+        onReset={onReset}
+        step={5}
+      />
     </div>
   )
 }
 ```
 
-```ts title="src/components/stateless-counter/index.ts"
-export * from './stateless-counter'
-export * from './stateless-counter-container'
-```
 
 Y añadimos el componente a nuestra página:
 
 
 ```ts title="src/app/counter/page.tsx"
-import { Counter } from '@/components/counter'
-import { StatelessCounterContainer } from '@/components/stateless-counter'
+import { CounterContainer } from '@/components/counter/counter-container'
+import { StatelessCounterContainer } from '@/components/counter/stateless-counter-container'
 
 export default function CounterPage() {
   return (
     <div className="flex flex-col gap-2">
       <h2>State Counters</h2>
       <div className="flex flex-row gap-2">
-        {Array.from({ length: 3 }, (_, id) => (
-          <Counter key={id} id={id} step={1} />
-        ))}
+        <CounterContainer />
       </div>
       <h2>Stateless Counters</h2>
-      <StatelessCounterContainer />
+      <div className="flex flex-row gap-2">
+        <StatelessCounterContainer />
+      </div>
     </div>
   )
 }
