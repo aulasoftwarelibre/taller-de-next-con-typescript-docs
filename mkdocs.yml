@@ -122,7 +122,7 @@ nav:
     - Configurando HeroUI: heroui.md
     - Storybook: storybook.md
   - Gestión del estado: 
-    - Componente contador: state.md
+    - Componente contador: counter.md
     - Componentes con estado: state-internal.md
     - Componentes sin estado: state-external.md
     - Context API: state-context.md
