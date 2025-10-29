@@ -12,11 +12,11 @@ Aunque es posible agregar React a un proyecto existente o crear una aplicación 
 
 En este curso, seguiremos el consejo de la documentación oficial y utilizaremos Next.js como nuestro framework principal para proyectos de React. Next.js simplifica la configuración inicial, proporciona rutas claras y ofrece una renderización del lado del servidor, lo que mejora el rendimiento y la experiencia del usuario.
 
-### Librerías de componentes: NextUI
+### Librerías de componentes: HeroUI
 
-Este curso se enfoca en el desarrollo de aplicaciones React y no en el diseño web en sí. Con el propósito de agilizar el proceso de diseño y mantener un aspecto profesional en nuestras aplicaciones, optaremos por utilizar NextUI como nuestra biblioteca de componentes.
+Este curso se enfoca en el desarrollo de aplicaciones React y no en el diseño web en sí. Con el propósito de agilizar el proceso de diseño y mantener un aspecto profesional en nuestras aplicaciones, optaremos por utilizar HeroUI como nuestra biblioteca de componentes.
 
-NextUI es una biblioteca de componentes de interfaz de usuario que se encuentra preestilizada y lista para ser utilizada. Una de sus ventajas notables es que está construida sobre Tailwind CSS, un popular framework de diseño que simplifica la creación de interfaces atractivas y responsivas. NextUI, al aprovechar Tailwind CSS, nos permite personalizar fácilmente el aspecto y la sensación de nuestros componentes sin necesidad de escribir CSS personalizado.
+HeroUI es una biblioteca de componentes de interfaz de usuario que se encuentra preestilizada y lista para ser utilizada. Una de sus ventajas notables es que está construida sobre Tailwind CSS, un popular framework de diseño que simplifica la creación de interfaces atractivas y responsivas. HeroUI, al aprovechar Tailwind CSS, nos permite personalizar fácilmente el aspecto y la sensación de nuestros componentes sin necesidad de escribir CSS personalizado.
 
 ### Herramientas de diseño: Storybook
 
