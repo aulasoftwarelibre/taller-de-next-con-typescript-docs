@@ -2,12 +2,9 @@ name: Build documentation
 
 on:
   push:
-    branches: [main]
-
-# Environment
-env:
-  PYTHON_VERSION: 3.10.13
-  POETRY_VERSION: 1.6.1
+    branches: 
+      - master
+      - main
 
 jobs:
   # Build and deploy documentation site
@@ -15,22 +12,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source form GitHub
-        uses: actions/checkout@v2
-
-      - name: Install Python runtime and dependencies
-        uses: actions/setup-python@v2
+        uses: actions/checkout@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          fetch-depth: 0
 
-      - name: Run image
-        uses: abatilo/actions-poetry@v2.0.0
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
         with:
-          poetry-version: ${{ env.POETRY_VERSION }}
+          python-version: "3.13"
+          version: "0.9.5"
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - name: Install dependencies
         run: |
-          poetry install
+          uv sync --locked --all-extras --dev
 
       - name: Deploy
         run: |
-          poetry run mkdocs gh-deploy --force
+          uv run mkdocs gh-deploy --force
