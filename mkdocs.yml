@@ -30,18 +30,21 @@ theme:
   name: "material"
   language: "es"
   palette:
-    # Palette toggle for light mode
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
       toggle:
-        icon: material/brightness-7
+        icon: material/toggle-switch-off-outline
         name: Switch to dark mode
-    # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+        icon: material/toggle-switch
+        name: Switch to system preference
 
 extra:
   social:
@@ -59,7 +62,7 @@ extra:
       link: "https://www.linkedin.com/company/aulasoftwarelibre/"
   analytics:
     provider: google
-    property: G-J34JHTH25G
+    property: UA-51754922-1
 
 extra_css:
   - stylesheets/extra.css
@@ -67,6 +70,8 @@ extra_css:
 plugins:
   - git-revision-date-localized:
       type: date
+  - search
+  - social
 
 markdown_extensions:
   - abbr
