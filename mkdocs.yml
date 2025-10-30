@@ -131,4 +131,4 @@ nav:
     - Integración con servicios REST: api-rest.md
   - Seguridad:
     - Conceptos básicos: security.md
-    - Instalar NextAuth: security-next-auth.md
+    - Configurar Better Auth: security-auth.md
